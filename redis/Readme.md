@@ -34,6 +34,18 @@
 > 
 > [참고 자료](https://iredays.tistory.com/125)
 
+Redis는 싱글 스레드를 사용해 Race Condition이 거의 발생하지 않는다는 장점이 있다. 하지만, 싱글 스레드는 멀티 스레드에 비해 속도의 한계가 명확하다.
+이 문제를 해결 하기 위해 Redis 6.0에서는 **ThreadedIO**가 도입되어, 기존보다 속도가 약 2.5배 빨라졌다고 한다. 메모리 내부에서 명령의 실행 자체는 싱글 스레드로 동작하나,
+
+- 클라이언트가 전송한 명령을 네트워크로 읽어서 파싱하는 부분
+- 명령이 처리된 결과 메시지를 클라이언트에게 네트워크로 전달하는 부분
+
+에 ThreadedIO가 적용
+
+자세한 내용은 아래 참고
+
+- [참고자료](https://charsyam.wordpress.com/2020/05/05/%EC%9E%85-%EA%B0%9C%EB%B0%9C-redis-6-0-threadedio%EB%A5%BC-%EC%95%8C%EC%95%84%EB%B3%B4%EC%9E%90/)
+
 ## 사용시 주의할 점
 - **시간 복잡도**
   - Single Threaded(싱글 스레드) 사용으로 한번에 하나의 명령만 수행이 가능하므로 처리 시간이 긴 요청의 경우 장애가 발생
@@ -206,13 +218,26 @@ redis에서는 데이터를 영구 저장하기 위해 두 가지 옵션 제공
 
 ## AOF(Append Only File)
 - 데이터를 변경하는 명령어가 들어오면 그것을 그대로 파일로 관리
+- 디스크에 appendonly.aof파일로 남김
+- non-blocking으로 동작하며, append-only이므로 write 속도가 빠르다
 - AOF 파일은 계속해서 추가되기만 하고 텍스트 형식이기 때문에 대부분 RDB파일보다 커지게 됨
 - 따라서 AOF 파일은 주기적으로 압축해서 재작성해야 됨
 - 실제 저장은 Redis protocol 형태로 저장
+- text파일이라 무겁기 때문에, `redis.conf`에 용량을 제한하거나 rewrite 기능 등을 설정해야 함
+
 
 ### 저장 방법
-- 자동 : redis.conf 파일에서 auto-aof-rewrite-percentege 옵션(크기 기준)
-- 수동 : BGREWRITEAOF 커맨드를 이용해 CLI 창에서 수동으로 AOF 파일 재작성
+- 자동 : redis.conf 파일에서 `auto-aof-rewrite-percentege` 옵션(크기 기준)
+- 수동 : `BGREWRITEAOF` 커맨드를 이용해 CLI 창에서 수동으로 AOF 파일 재작성
+
+### appendfsync
+AOF는 버퍼 캐시에 저장하고 적절한 시점에 이 데이터를 디스크로 저장하는데, appendfsync로 디스크와 동기화를 얼마나 자주 할 것인지 설정할 수 있다.
+- **always**: 명령 실행 시 마다 AOF 기록. 정합성은 높지만 성능이 매우 떨어진다.
+- **everysec**: 1초마다 AOF에 기록. 권장
+- **no**: AOF 기록 시점을 OS가 정한다.(일반적인 리눅스 디스크 기록 간격은 30초) 데이터가 유실될 수 있다.
+
+### rewrite
+AOF 파일의 상태가 특정 조건일 때 AOF 파일을 현재 상태에 맞춰, 설정에 따라 덮어쓰기 하거나 새로 생성하도록 한다.
   
 ## RDB(snapshat)
 - 명령어를 저장하지 않고 저장 당시에 메모리를 그대로 파일로 관리
@@ -221,6 +246,17 @@ redis에서는 데이터를 영구 저장하기 위해 두 가지 옵션 제공
 ### 저장 방법
 자동 : redis.conf 파일에서 SAVE 옵션(시간 기준)
 수동 : `BGSAVE` 커맨드를 이용해서 CLI 창에서 수동으로 RDB 파일 저장, `SAVE` 커맨드는 절대 사용 X
+
+### 스냅샷 방식 두가지
+- `SAVE`: blocking으로 redis 동작을 정지시키고, snapshot을 저장
+  1. Main process가 데이터를 새 RDB temp 파일에 쓴다.
+  2. 쓰기가 끝나면 기존 파일을 지우고 새 파일로 교체한다.
+
+- `BGSAVE`: non-blocking으로, 별도의 자식 프로세스(백그라운드 SAVE)를 띄운 후, 명령어 수행 당시의 snapshot을 저장
+- redis는 동작을 멈추지 않는다. `fork()`를 하기 때문에 메모리를 두 배정도 사용하므로 주의해야함
+  1. Child process를 fork()한다.
+  2. Child process는 데이터를 새 RDB temp 파일에 쓴다.
+  3. 쓰기가 끝나면 기존 파일을 지우고, 이름을 변경한다.
 
 ## 선택 기준
 - 레디스를 단순 캐시로만 사용하는 경우 백업은 불필요함. 
