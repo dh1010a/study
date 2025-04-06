@@ -1,5 +1,5 @@
 # Other Content
-1. [레디스 스트림]()
+1. [레디스 스트림](https://github.com/dh1010a/study/blob/main/redis/redis-stream.md)
 
 <br><br>
 
