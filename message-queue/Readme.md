@@ -1,3 +1,6 @@
+# Other Content
+- [Apache Kafka](https://github.com/dh1010a/study/blob/main/kafka/Readme.md)
+
 # Message Queue
 
 ![image](https://github.com/user-attachments/assets/c1a0f219-e105-407e-8f0c-333e3f56aee1)
@@ -189,8 +192,40 @@
 
 > Kafka는 단일 시스템이 아닌 이벤트 스트리밍 플랫폼으로서, 대규모 시스템 간 이벤트 기반 통신과 분석을 위한 중심 허브 역할을 수행
 
+## Redis Stream (이벤트 브로커)
+- Redis Stream은 Redis 5.0부터 도입된 데이터 구조로, 고성능 인메모리 기반의 로그형 스트림 처리 시스템
+- Kafka처럼 시간순으로 정렬된 로그 데이터를 저장하며, 여러 Consumer가 구독하여 데이터를 처리
+- Redis의 장점인 빠른 응답 속도와 단순한 설정으로 실시간 메시징 처리에 적합하며, 경량 이벤트 브로커로 많이 사용
+- 읽은 메시지를 ack 처리해야 함 (XACK)
+- TTL 없음: 직접 삭제하거나 보관 정책 정해야 함
+
+![image](https://github.com/user-attachments/assets/79148497-574c-4012-baf9-ad33a107bfe4)
+
+
+### 주요 개념
+- Stream: 다른 MQ의 Queue와 유사한 개념이다. key(Stream 이름)로 구분
+- Entry ID: 개별 메시지가 Stream에 저장되는 시간(Epoch Time)을 ID로 가진다. 따라서 Redis Pub/Sub과 달리 개별 메시지 구분 및 에러 처리가 가능
+- Producer: XADD 명령어로 Stream에 메시지 추가
+- Consumer Group: XGROUP을 통해 그룹을 생성하고, 여러 Consumer가 메시지를 병렬로 처리
+- Consumer: XREADGROUP으로 메시지를 읽고 처리
+- Pending List: 아직 ack 처리되지 않은 메시지 추적 가능
+
+![image](https://github.com/user-attachments/assets/221913a2-f824-427e-9ab3-b30f6d51f803)
+
+
+### 장점
+- 초경량: Redis 기반이므로 빠르고 가벼움
+- 간편한 설치: Redis 하나로 메시징 시스템을 구성할 수 있음
+- 수동 ack 및 재처리 가능: 메시지를 처리 후 명시적으로 ack 필요
+- 타임라인 기반 메시지 처리에 적합 (ex. 채팅, 알림)
+
+### 단점
+- 디스크 기반 아키텍처가 아님: 메모리에 의존, 장기 저장엔 부적합
+- 복제 및 장애 복구는 Sentinel/Cluster에 의존
+- 대규모 처리나 장기 보존용에는 적합하지 않음 (Kafka 대비)
+
 
 ## Reference
 - https://lifttime.tistory.com/45
 - https://velog.io/@choidongkuen/%EC%84%9C%EB%B2%84-%EB%A9%94%EC%84%B8%EC%A7%80-%ED%81%90Message-Queue-%EC%9D%84-%EC%95%8C%EC%95%84%EB%B3%B4%EC%9E%90#3-kafka
-
+- https://velog.io/@nwactris/MQ-%EB%B3%84-%ED%8A%B9%EC%A7%95-3.-Redis-Stream2
