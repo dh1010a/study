@@ -189,3 +189,8 @@
 
 > Kafka는 단일 시스템이 아닌 이벤트 스트리밍 플랫폼으로서, 대규모 시스템 간 이벤트 기반 통신과 분석을 위한 중심 허브 역할을 수행
 
+
+## Reference
+- https://lifttime.tistory.com/45
+- https://velog.io/@choidongkuen/%EC%84%9C%EB%B2%84-%EB%A9%94%EC%84%B8%EC%A7%80-%ED%81%90Message-Queue-%EC%9D%84-%EC%95%8C%EC%95%84%EB%B3%B4%EC%9E%90#3-kafka
+
