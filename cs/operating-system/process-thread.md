@@ -1,4 +1,4 @@
-# Operation System
+# Process & Thread
 
 ## 목차
 1. 프로세스와 스레드 개념
