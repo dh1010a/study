@@ -271,3 +271,8 @@ db.student.drop() // Drops the entire collection
 - RDB를 수평적 확장하려면 샤딩(sharding)이 필요
   - 샤딩: 데이터가 수평적으로 분할되고 기기의 모음 전반에 걸쳐 분산되는 경우)
 - ACID 준수를 유지하면서 RDB를 샤딩하는 것은 매우 어려운 일
+
+
+## Ref
+- [기출로 대비하는 개발자 전공면접](https://www.inflearn.com/course/%EA%B0%9C%EB%B0%9C%EC%9E%90-%EC%A0%84%EA%B3%B5%EB%A9%B4%EC%A0%91-cs-%EC%99%84%EC%A0%84%EC%A0%95%EB%B3%B5/dashboard)
+- [Interview_Question_for_Beginner](https://github.com/jbee37142/Interview_Question_for_Beginner/blob/main/Database/README.md#part-1-5-database)
