@@ -69,3 +69,4 @@
 ## Ref
 - https://adjh54.tistory.com/378
 - https://jhyonhyon.tistory.com/67
+- https://velog.io/@pms000723/Spring-Transactional-%EC%96%B4%EB%85%B8%ED%85%8C%EC%9D%B4%EC%85%98%EA%B3%BC-%EB%8F%99%EC%9E%91-%EC%9B%90%EB%A6%AC
