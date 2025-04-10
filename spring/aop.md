@@ -1,4 +1,4 @@
-# Spring AOP
+# AOP
 
 ## 목차
 1. AOP란?
