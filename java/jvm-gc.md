@@ -8,13 +8,13 @@
    - Interpreter
    - JIT
    - Garbage Collector
-4. Runtime Data Area
+3. Runtime Data Area
   - 3.1 PC Register
   - 3.2 JVM 스택 영역
   - 3.3 Native method Stack
   - 3.4 Method Area
   - 3.5 Heap
-
+4. Garbage Collection
 
 
 # 1. Java Virtual Machine
@@ -190,6 +190,29 @@ GC를 수행하는 모듈(쓰레드)
 - 인스턴스는 소멸 방법과 소멸 시점이 지역 변수와는 다르기에 힙이라는 별도 영역에 할당
 - 자바 가상 머신은 매우 합리적으로 인스턴스를 소멸시킴
 - 더 이상 인스턴스의 존재 이유가 없을때 소멸
+
+# 4. Garbage Collection
+
+![image](https://github.com/user-attachments/assets/14bce957-7b60-445b-b7fd-da0300b13302)
+
+- 자바 이전에는 프로그래머가 모든 프로그램 메모리를 관리했음 하지만, 자바에서는 JVM이 프로그램 메모리를 관리
+- JVM은 가비지 컬렉션이라는 프로세스를 통해 메모리를 관리
+- 가비지 컬렉션은 자바 프로그램에서 사용되지 않는 메모리를 지속적으로 찾아내서 제거하는 역할
+
+## 4.1 Minor GC
+- 새로 생성된 대부분의 객체(Instance)는 Eden영역에 위치
+- Eden 영역에서 GC가 한 번 발생한 후 살아남으면 Survivor 영역 중 하나로 이동
+- 이 과정을 반복하다가 살아남은 객체는 일정시간 참조되고 있다는 뜻이므로 Old로 이동시킴
+
+## 4.2 Major GC
+- Old 영역에 있는 모든 객체들을 검사하여 참조되지 않은 객체들을 한꺼번에 삭제
+- 시간이 오래 걸리고 실행 중 프로세스가 정지됨
+- 이것을 'stop-the-world'라고함
+- Major GC가 발생하면 GC를 실행하는 스레드를 제외한 나머지 스레드는 모두 작업을 멈춤
+- GC가 완료 된 후 중단했던 작업을 다시 시작
+
+### 소멸시킬 대상을 정하는 원리 참고
+- [링크](https://asfirstalways.tistory.com/159)
 
 ## Ref
 - [자바 가상머신, JVM은 무엇인가?](https://asfirstalways.tistory.com/158)
