@@ -280,8 +280,6 @@
 - 임계 영역의 원자성을 보장하여 프로세스와 스레드들이 동기화되도록 할 수 있음
 - 동기화 방법은 대표적으로 Mutex와 Semaphore가 있음
 
-![image](https://github.com/user-attachments/assets/d14c4e53-0491-420f-9ba4-51fe4d8f6bbc)
-
 ### Mutex
 - 동기화 방법 중 하나로 mutual exclusion의 축약어
 - 공유자원에 접근할 수 있는 프로세스와 스레드의 수를 1개로 제한]
@@ -360,7 +358,7 @@ signal(S) {
 - 메모리 구분이 필요할때는 multi process가 유리
 - 반면에 컨텍스트 스위칭이 자주 일어나고 데이터 공유가 빈번한 경우, 그리고 자원을 효율적으로 사용해야 되는 경우에는 multi thread를 사용하는 것이 유리
 
-- |  | 메모리 사용 / CPU 시간 | Context switching | 안정성 |
+| 종류 | 메모리 사용 / CPU 시간 | Context switching | 안정성 |
 | --- | --- | --- | --- |
 | multi process | 많은 **메모리 공간 / CPU 시간** 차지 | 느림 | 높음 |
 | multi thread | 적은 **메모리 공간 / CPU 시간** 차지 | 빠름 | 낮음 |
