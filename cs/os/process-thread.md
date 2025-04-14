@@ -464,3 +464,4 @@ signal(S) {
 - [BJ.5 프로세스, 스레드, 멀티태스킹, 멀티스레딩, 멀티프로세싱, 멀티프로그래밍까지 한 방에 깔끔하게 설명](https://www.youtube.com/watch?v=QmtYKZC0lMU)
 - [기출로 대비하는 개발자 전공면접](https://www.inflearn.com/course/%EA%B0%9C%EB%B0%9C%EC%9E%90-%EC%A0%84%EA%B3%B5%EB%A9%B4%EC%A0%91-cs-%EC%99%84%EC%A0%84%EC%A0%95%EB%B3%B5/dashboard)
 - https://www.youtube.com/watch?v=Dms1oBmRAlo&t=16s
+- https://peonyf.tistory.com/entry/OS-Process-%EB%8F%99%EA%B8%B0%ED%99%94
