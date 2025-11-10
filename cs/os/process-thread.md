@@ -65,7 +65,7 @@
 
 <img width="1430" alt="image" src="https://github.com/user-attachments/assets/8ef38d84-7dd5-4753-929c-9313941c9b5c" />
 
-- 힙 영역을 공유
+- stack, data, heap 영역을 공유
 - 스택과 코드 영역의 프로그램 카운터는 스레드가 고유하게 사용
   - 프로그램 카운터는 다음번에 실행되야할 명령어가 있는 주소를 가리킴
   - 엄밀히 말하면, 코드 영역의 Program Counter는 고유하지만 나머지는 공유!
