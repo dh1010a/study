@@ -177,6 +177,10 @@
 - 선택도 = 카디널리티 / 전체 로우 수
 - 선택도가 낮은게 좋은것
 
+다만, 선택도를 무조건 적으로 카디널리티 / 전체 로우 수 로 하는것은 위험하다. 만약 100명의 성별을 기준으로 인덱스를 건다고 했을 때, 카디널리티가 2면 선택도는 2%가 된다. 하지만 평균 성별 분포가 50:50 이라고 했을때 선택도는 해당 (검색하고자 하는 특정 값의 row의 수(=특정 값들의 평균 row수)/100)으로 계산해야 옳다. 그렇다면 선택도는 50/100이 되어 50%가 된다.
+
+[참고 링크](https://yurimkoo.github.io/db/2020/03/14/db-index.html)
+
 ## Ref
 - [tech-interview-for-developer](https://github.com/gyoogle/tech-interview-for-developer/blob/master/Computer%20Science/Database/Transaction%20Isolation%20Level.md)
 - [Interview_Question_for_Beginner](https://github.com/jbee37142/Interview_Question_for_Beginner/tree/main/Database)
