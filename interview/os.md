@@ -7,6 +7,15 @@
   </ul>
 </details>
 
+<details>
+  <summary>OOM과 Stack OverFlow의 차이점을 말해주세요.</summary>
+  <ul>
+    <li> 운영체제에서 스택 오버플로우는 프로세스의 스택 영역이 함수 호출 프레임으로 가득 차서 발생하며 보통 재귀 호출이 원인입니다. 반면 OOM은 프로세스의 힙이나 os 전체 메모리가 부족해 더 이상 메모리를 할당할 수 없을 때 발생하며 malloc 실패 또는 oom killer로 이어집니다. 스택 오버플로우는 스택 고정크기 초과, OOM은 전체 메모리 부족입니다.</li>
+  </ul>
+</details>
+
+
+
 ## System Call
 
 <details>
