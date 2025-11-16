@@ -103,7 +103,32 @@
 <details>
   <summary>AOP는 뭔가요?</summary>
   <ul>
-    <li> 로깅, 트랜잭션 등 핵심 비즈니스 로직과 별개의 횡단 관심사를 모듈화 하는 프로그래밍 기법입니다. 스프링에서 AOP는 Aspect, JoinPoint, Advice, PointCut 등의 개념을 통해 처리됩니다.</li>
+    <li> 로깅, 트랜잭션 등 핵심 비즈니스 로직과 별개의 횡단 관심사를 모듈화 하는 프로그래밍 기법입니다. 스프링에서 AOP는 프록시를 기반으로 구현하며, 프록시가 메서드를 가로채 Advice를 실행하고 이후 실제 메서드를 호출합니다. Porintcut으로 어떤 메서드에 적용할지 정하고 Advice를 언제 실행할지 정합니다. Aspect, JoinPoint, Advice, PointCut 등의 개념을 통해 처리됩니다.</li>
+  </ul>
+</details>
+
+<details>
+  <summary>AOP적용 방식에 대해 설명해주세요</summary>
+  <ul>
+    <li> AOP 적용 방식은 크게 컴파일 시점, 클래스 로딩 시점, 런타임으로 나눌 수 있습니다. 컴파일 시점은 AspectJ 컴파일러가 .java → .class로 변환하는 과정에서 부가 기능을 직접 바이트코드에 삽입합니다. 매우 빠르고 강력하지만 개발 환경이 복잡해서 잘 사용하지 않습니다. 클래스 로딩 시점은 JVM이 클래스 파일을 로딩할 때 Instrumentation API나 AspectJ LTW를 통해 바이트코드를 조작하는 방식으로, 모니터링/프로파일링 툴들이 많이 사용합니다. Spring AOP는 런타임 방식으로, 컴파일 또는 로딩 시점을 건드리지 않고, 스프링이 bean을 생성할 때 프록시를 만들어 메서드 호출을 가로채고 Advice를 실행하는 방식으로 작동합니다. 스프링이 기본적으로 프록시 기반 런타임 AOP를 사용하는 이유는 설정이 단순하고 안정적이기 때문입니다.</li>
+  </ul>
+</details>
+
+<details>
+  <summary>Spring은 AOP 프록시 객체를 어떻게 만드나요?</summary>
+  <ul>
+    <li> 스프링은 AOP를 적용하기 위해 빈 생성 과정에서 AbstractAutoProxyCreator가 빈을 검사하여 AOP 대상인지 확인하고, 대상이라고 판단되면 ProxyFactory를 사용해 Dynamix Proxy Bean을 생성하고, 원본 빈 대신 이 프록시 빈을 IoC 컨테이너에 등록합니다. 인터페이스가 있으면 JDK 프록시, 없으면 CGLIB 프록시를 사용하며 클라이언트의 모든 호출은 프록시를 거쳐 어드바이스가 실행됩니다.</li>
+  </ul>
+</details>
+
+<details>
+  <summary>Spring은 AOP에서 private 메서드, final 메소드 및 클래스, static 메소드, 내부 호출, 생성자에 aop가 적용되지 않는 이유가 뭔가요?</summary>
+  <ul>
+    <li> private 메서드는 외부에서 호출이 불가능한 메서드이기 때문입니다. 프록시는 외부에서 들어오는 메서드 호출을 가로채는 객체입니다. 그런데 private는 TargetBean 외부 객체인 프록시에서 호출할 수 없기 때문입니다. </li>
+    <li> final 메서드나 클래스에 안되는 이유는, 프록시는 상속 후 오버라이드 방식으로 동작합니다. 그런데 final 메서드는 오버라이드가 안되고, final 클래스는 상속이 금지됩니다. 따라서 프록시 클래스를 만들 수 없습니다.</li>
+    <li> static 메서드가 안되는 이유는, AOP는 인스턴스 메서드 호출을 가로채는 구조인데, static메서드는 클래스 단위로 호출을 하거나 인스턴스 없이 호출되기 때문입니다. 따라서 인스턴스 호출이 아니기 때문에 프록시가 개입할 구조가 없습니다.</li>
+    <li> 내부 호출 (this.method())가 안되는 이유는, 스프링 IoC에 등록하는 빈은 프록시 빈입니다. 그런데 클래스 내부에서 호출을 하게 되면, 외부 호출은 프록시를 거치지만 내부 호출은 프록시를 안거치고 메서드를 직접 호출되게 되기 때문입니다.</li>
+    <li> Spring AOP는 원본 Bean을 컨테이너에 등록하지 않고, 원본 Bean을 감싼 Proxy Bean을 IoC 컨테이너에 등록합니다. 프록시 내부에 실제 Target 객체가 필드로 저장되어 있고, 외부 모든 호출은 ProxyBean을 거쳐서 TargetBean을 실행합니다. 내부 호출(this.method)은 TargetBean 내부에서 이루어지기 때문에 프록시를 거치지 않아 AOP 적용이 안 됩니다.</li>
   </ul>
 </details>
 
