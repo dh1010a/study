@@ -223,6 +223,24 @@
   </ul>
 </details>
 
+<details>
+  <summary> PK가 AUTO_INCREASE면 bulk 연산이 가능한가요? </summary>
+  <ul>
+    <li> AUTO_INCREMENT라고 해서 bulk insert가 불가능한 것은 아닙니다. 단지 InnoDB의 auto-increment lock 때문에 다중 스레드 환경에서는 성능이 떨어질 수 있습니다. 단일 bulk insert는 오히려 빠르게 동작하지만, 대규모 병렬 insert에서는 lock 경합이 생길 수 있습니다.</li>
+    <li> 기능적으로는 AUTO_INCREMENT여도 Bulk Insert가 가능합니다. 하지만 InnoDB에서는 AUTO_INCREMENT 값을 row마다 생성해야 하고,
+이 과정에서 auto-increment lock이나 ID 생성 직렬화가 발생합니다. 그래서 Bulk Insert로 묶어도 내부적으로는 각 row가 개별적으로 ID 생성 → 삽입 과정을 거쳐 실질적인 성능 향상은 거의 없습니다. 그래서 대량 Insert에서는 Snowflake나 UUID 같은 별도 키 생성 방식을 사용합니다</li>
+  </ul>
+</details>
+
+<details>
+  <summary> MySQL에서 batch insert vs multi-row insert 차이? </summary>
+  <ul>
+    <li> multi-row insert는 SQL 한 번으로 여러 row를 삽입하는 것이고, batch insert는 JDBC나 MyBatis가 여러 insert를 ‘네트워크 한 번에’ 보낸 것입니다. SQL 레벨에서 한 번 insert하는 multi-row insert가 훨씬 빠르지만, 로직에 따라 batch insert를 선호하는 경우도 있습니다.</li>
+  </ul>
+</details>
+
+
+
 
 ## Connection Pool
 
@@ -549,6 +567,13 @@
   <ul>
     <li>기존 인덱스를 삭제하고 새로운 인덱스를 생성하여 물리적으로 연속되게 위치하도록 재구성 하는 방법이 있습니다.다만 대규모 데이터의 경우 시간이 오래 걸릴 수 있으며 해당 테이블이 잠길 수 있습니다. </li>
     <li>또한 인덱스의 논리적인 순서는 유지하되 물리적으로 연속되게 위치하도록 물리적으로 인접한 블록들을 다시 정렬하여 공간을 압축합니다. 완벽하게 해결할 수 없지만 서비스 중에서도 변경할 수 있어 중단 시간을 최소화 할 수 있습니다.</li>
+  </ul>
+</details>
+
+<details>
+  <summary> 랜덤 UUID를 PK로 쓴다면 느린가요?</summary>
+  <ul>
+    <li>UUID는 값이 랜덤이기 때문에 클러스터드 인덱스의 중간에 계속 삽입됩니다. 그 결과 페이지 split, 인덱스 재정렬, 랜덤 write가 발생해 AUTO_INCREMENT보다 훨씬 느립니다</li>
   </ul>
 </details>
 
