@@ -220,15 +220,6 @@
 </details>
 
 <details>
-  <summary>TCP의 keep-alive와 HTTP의 keep-alive의 차이는 무엇인가요? </summary>
-  <ul>
-    <li> TCP의 keep-alive: TCP 수준에서의 연결이 여전히 활성 상태인지 확인하기 위해 사용되는 기능이다.일정 시간 동안 데이터 교환이 없을 경우, keep-alive 패킷을 송수신하여 연결이 유효한지 검사한다.</li>
-    <li> HTTP의 keep-alive: HTTP 프로토콜 수준에서 클라이언트와 서버 간에 여러 HTTP 요청/응답을 동일한 TCP 연결을 재사용하여, TCP 연결의 설정과 종료에 따른 지연과 오버헤드를 줄인다.</li>
-    <li> TCP Keep-Alive는 TCP 레벨에서 상대 노드가 살아있는지를 확인하는 Health-check 기능입니다. 반면 HTTP Keep-Alive는 애플리케이션 계층에서 TCP 연결을 재사용하여 여러 HTTP 요청을 처리하는 기능입니다. TCP Keep-Alive는 OS가 관리하는 low-level 기능이고, HTTP Keep-Alive는 HTTP 성능 최적화를 위한 connection reuse 기능이므로 목적과 레이어가 완전히 다릅니다.</li>
-  </ul>
-</details>
-
-<details>
   <summary>HTTP와 장단점에 대해 설명해주세요 </summary>
   <ul>
     <li> HTTP는 단순하고 표준화되어 있어서 어디서든 사용할 수 있다는 장점이 있습니다. Stateless한 구조라 서버 확장성이 뛰어나고, 캐싱이나 CDN과 잘 연동됩니다. 반면 평문 기반이라 보안에 취약하고(HTTPS로 해결 가능), 상태를 유지하지 않기 때문에 세션 관리가 필요합니다. 또한 요청-응답 기반이라 실시간 푸시가 어렵고, 텍스트 기반이라 오버헤드가 크다는 단점이 있습니다.</li>
