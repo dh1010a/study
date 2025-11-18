@@ -269,3 +269,11 @@
     <li> @Async는 스프링에서 메서드를 별도의 스레드에서 비동기로 실행할 수 있도록 해주는 기능입니다. 스프링이 해당 메서드를 프록시로 감싸고, 호출 시 TaskExecutor 스레드풀에 작업을 넘겨 비동기적으로 실행합니다. 다만 프록시 기반이라 같은 클래스 내부 호출 시 동작하지 않고, public 메서드만 가능하며, 트랜잭션 범위도 별도 스레드라 주의 해야합니다.</li>
   </ul>
 </details>
+
+<details>
+  <summary>Tomcat 비동기 MVC vs WebFlux 차이</summary>
+  <ul>
+    <li> Spring MVC의 비동기 Servlet은 Callable이나 DeferredResult를 사용해 Worker Thread를 빠르게 반환하고 실제 작업은 별도의 스레드에서 실행하는 방식입니다. 이는 스레드 사용 최적화에는 도움이 되지만
+I/O 자체는 블로킹이기 때문에 구조적으로는 여전히 스레드 기반 서버입니다. 반면 WebFlux는 Netty 기반의 이벤트 루프 모델을 사용하며 모든 I/O가 논블로킹으로 처리됩니다. EventLoop 스레드 하나가 수백~수천 커넥션을 관리할 수 있고, 블로킹 호출은 반드시 boundedElastic 스레드풀로 분리해야 합니다. 그래서 MVC 비동기는 “스레드 활용 개선”이고, WebFlux는 “아키텍처 자체가 고성능 논블로킹 모델”이라는 차이가 있습니다.</li>
+  </ul>
+</details>
