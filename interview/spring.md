@@ -87,16 +87,19 @@
 <details>
   <summary>필터와 인터셉터에 대해 설명해주세요</summary>
   <ul>
-    <li> 필터는 디스패처 서블릿에 요청이 전달되기 전/후에 url 패턴에 맞는 모든 요청에 대해 부가작업을 처리할 수 있는 기능을 제공합니다. 즉, 스프링 컨테이너가 아닌 톰캣과 같은 웹 컨테이너(서블릿 컨테이너)에 의해 관리가 되는것이고 디스패처 서블릿 전/후에 처리하는것입니다. </li>
-    <li> 인터셉터는 필터와 다르게 스프링이 제공하는 기술로서, 디스패처 서블릿이 컨트롤러를 호출하기 전과 후에 요청과 응답을 참조하거나 가공할 수 있는 기능을 제공합니다. 즉 웹 컨테이너에서 동작하는 필터와 달리 인터셉터는 스프링 컨텍스트에서 동작합니다. </li>
+    <li> 필터(Filter)는 Servlet 스펙 기반으로 WAS 단계에서 동작합니다. DispatcherServlet 이전에 실행되기 때문에 스프링과 무관하게 모든 요청에 공통적으로 적용해야 하는 ‘전역적·기술적 처리’를 담당합니다. 예를 들어 XSS 방어, CORS 처리, 인코딩, gzip 압축, 또는 ContentCachingRequestWrapper로 body를 캐싱하는 것처럼 요청/응답 Body까지 조작해야 하는 작업은 필터에서 처리합니다.</li>
+    <li> 인터셉터(Interceptor)는 Spring MVC 레벨에서 DispatcherServlet 이후, 컨트롤러 호출 직전·직후에 실행됩니다. 그래서 스프링 세션, 핸들러 정보(Controller/Method), 어노테이션 등 Spring MVC 정보에 접근할 수 있다는 것이 큰 차이점입니다. 이 때문에 인증/인가, API나 메서드 기반 로깅, 요청 경로 기반 공통 검증처럼 비즈니스 로직과 맞닿아 있는 전처리·후처리 작업을 처리하기에 적합합니다.</li>
+    <li> <img width="918" height="294" alt="image" src="https://github.com/user-attachments/assets/319675dc-82c4-4036-a921-f8100ed1186f" />
+</li>
   </ul>
 </details>
 
 <details>
   <summary>필터와 인터셉터는 언제 사용하면 좋을까요?</summary>
   <ul>
-    <li> 필터는 xss/방어 및 인증/인가 관련 작업, 모든 요청에 대한 로깅 또는 감사, 이미지/데이터 압축 및 문자열 인코딩, 스프링과 분리되어야 하는 기능 용도로 사용합니다. 또한 request/response 객체를 조작할 필요가 있을때 사용합니다. </li>
-    <li>  인터셉터는 세부적인 보안 및 인증/인가 공통 작업, API 호출에 대한 로깅 또는 감사, Controller로 넘겨주는 정보의 가공 시 사용합니다. Request와 response를 조작할 수 없으며 스프링 예외처리도 불가능합니다.</li>
+    <li> 먼저 필터(Filter)는 DispatcherServlet 이전에 실행되기 때문에, 스프링과 무관한 전역적이고 기술적인 처리가 필요할 때 사용합니다. 예를 들어 XSS 방어, CORS 처리, 인코딩, gzip 압축, request/response body 래핑처럼 모든 요청에 공통적으로 적용해야 하는 작업이 적합합니다.
+필터는 request와 response의 body까지 직접 조작할 수 있다는 점도 큰 특징입니다. </li>
+    <li>  반대로 인터셉터(Interceptor)는 DispatcherServlet 이후 즉, 컨트롤러 호출 전후에 동작하기 때문에 Spring MVC 흐름에 맞춘 전처리/후처리에 적합합니다. 사용자의 인증 여부 확인, HandlerMethod 기반의 접근 제어, API 단위 로깅, 컨트롤러로 전달할 request attribute 가공 같은 작업을 주로 처리합니다. body 조작은 불가능하지만 헤더나 attribute 조작은 가능하고, 예외를 던지면 스프링의 @ControllerAdvice가 정상적으로 처리해줍니다.</li>
   </ul>
 </details>
 
@@ -192,6 +195,27 @@
 </details>
 
 <details>
+  <summary> @AllArgsConstructor, @RequiredArgsConstructor, @NoArgsConstructor 차이 </summary>
+  <ul>
+    <li> Lombok은 생성자를 자동으로 만들어주기 위해 여러 어노테이션을 제공합니다. @AllArgsConstructor는 모든 필드를 받는 생성자, @RequiredArgsConstructor는 final 또는 @NonNull 필드만 받는 생성자, @NoArgsConstructor는 기본 생성자를 만들어줍니다. 스프링에서는 주로 불변성을 유지하기 위해 @RequiredArgsConstructor를 사용하고, JPA 엔티티는 @NoArgsConstructor(access = PROTECTED)를 많이 씁니다./li>
+  </ul>
+</details>
+
+<details>
+  <summary> 스프링에서 @RequiredArgsConstructor를 권장하는 이유는 무엇인가요? </summary>
+  <ul>
+    <li> @RequiredArgsConstructor는 final 필드만 생성자 파라미터로 받기 때문에 의존성을 반드시 주입하도록 강제하고, 불변성과 테스트 용이성도 확보됩니다. 필드 주입이나 setter 주입보다 훨씬 안정적(setter 주입은 런타임 오류를 유발하기 쉽고, 필드 주입은 테스트하기 어렵습니다)이기 때문에 스프링에서는 거의 표준처럼 사용됩니다/li>
+  </ul>
+</details>
+
+<details>
+  <summary> JPA에서 기본 생성자가 필요한 이유는 무엇인가요? </summary>
+  <ul>
+    <li>JPA는 엔티티를 new로 생성하지 않고 내부적으로 리플렉션으로 생성합니다. 이때 파라미터가 없는 기본 생성자가 없으면 객체를 만들 수 없습니다. 또한 lazy loading 프록시를 만들 때도 필요합니다. 그래서 JPA 엔티티는 @NoArgsConstructor(access = PROTECTED)로 기본 생성자를 만들도록 권장합니다.”/li>
+  </ul>
+</details>
+
+<details>
   <summary> 보일러플레이트 코드가 뭔가요? </summary>
   <ul>
     <li> 소프트웨어 개발에서 반복적으로 작성해야하는, 하지만 비즈니스 코드와 직접적으로 관련이 없는 코드를 의미합니다.  </li>
@@ -277,3 +301,65 @@
 I/O 자체는 블로킹이기 때문에 구조적으로는 여전히 스레드 기반 서버입니다. 반면 WebFlux는 Netty 기반의 이벤트 루프 모델을 사용하며 모든 I/O가 논블로킹으로 처리됩니다. EventLoop 스레드 하나가 수백~수천 커넥션을 관리할 수 있고, 블로킹 호출은 반드시 boundedElastic 스레드풀로 분리해야 합니다. 그래서 MVC 비동기는 “스레드 활용 개선”이고, WebFlux는 “아키텍처 자체가 고성능 논블로킹 모델”이라는 차이가 있습니다.</li>
   </ul>
 </details>
+
+## 영속성 컨텍스트
+
+<details>
+  <summary>영속성 컨텍스트가 뭔가요?</summary>
+  <ul>
+    <li> 영속성 컨텍스트는 JPA가 엔티티를 관리하는 일종의 1차 캐시입니다. 엔티티를 조회하거나 저장할 때 바로 DB에 접근하는 것이 아니라 먼저 영속성 컨텍스트라는 메모리 공간에서 관리합니다. 이를 통해 여러 기능이 제공되는데, 먼저 1차 캐시를 통해 같은 엔티티는 한 번만 DB에서 조회하고, 엔티티 동일성을 보장해서 트랜잭션 내에서 항상 동일 객체를 사용합니다. 또한 변경 감지를 통해 엔티티의 변경사항을 자동으로 update SQL로 반영하고, 쓰기 지연으로 SQL을 모아서 커밋 시 한 번에 실행해 성능을 최적화합니다. 마지막으로 지연 로딩도 지원하여 필요한 시점에만 연관 데이터를 조회합니다. 즉, 영속성 컨텍스트는 JPA 성능 최적화·자동 변경 반영·지연 로딩 같은 기능을 제공하는 핵심 메커니즘입니다.</li>
+  </ul>
+</details>
+
+<details>
+  <summary>영속성 컨텍스트가 왜 성능 개선에 도움이 되나요?</summary>
+  <ul>
+    <li> 첫 번째는 1차 캐시입니다. 한 트랜잭션 내에서 같은 엔티티를 여러 번 조회해도 DB를 반복해서 호출하지 않고 캐시에서 바로 반환합니다. 이것만으로도 조회 성능이 크게 좋아집니다. 두 번째는 쓰기 지연(Write-behind)입니다. save() 호출 시 즉시 insert 쿼리를 날리지 않고 쓰기 지연 SQL 저장소에 모아두었다가 트랜잭션 커밋 시 한 번에 DB로 반영합니다. 즉, 네트워크 I/O를 줄이고 배치처럼 일괄 처리하여 성능을 최적화합니다. 세 번째는 변경 감지(Dirty Checking)입니다. 개발자가 직접 update SQL을 작성하지 않아도, JPA가 트랜잭션 종료 시점에 변경된 필드만 감지해서 최소한의 SQL을 생성합니다. 이 또한 불필요한 탐색과 호출을 줄여 성능을 높입니다.</li>
+  </ul>
+</details>
+
+<details>
+  <summary>1차 캐시와 2차 캐시의 차이점은 뭔가요?</summary>
+  <ul>
+    <li> 1차 캐시는 영속성 컨텍스트 안의 캐시로, 트랜잭션 단위·EntityManager 단위로만 유지됩니다. 트랜잭션이 끝나면 폐기되고, 동일한 트랜잭션 안에서만 엔티티 동일성을 보장합니다. 반면 2차 캐시는 애플리케이션 전체 범위의 글로벌 캐시입니다. 대표적으로 Hibernate의 Shared Cache나 Ehcache, Redis 같은 외부 캐시도 이용할 수 있습니다. 2차 캐시는 트랜잭션이 바뀌어도 유지되며, 서버 전체에서 공통으로 사용하는 캐시로 주로 조회 최적화 용도로 쓰입니다.</li>
+  </ul>
+</details>
+
+<details>
+  <summary>영속성 컨텍스트의 상태에 대해 설명해주세요</summary>
+  <ul>
+    <li> 첫 번째는 비영속 상태입니다. new로 객체를 만들었지만 아직 영속성 컨텍스트에 관리되지 않는 상태입니다. 따라서 변경 감지나 1차 캐시 같은 기능은 전혀 적용되지 않습니다. 두 번째는 영속 상태입니다. em.persist()하거나 find로 조회해서 영속성 컨텍스트에 등록된 상태입니다. 이때부터 1차 캐시, 동일성 보장, 변경 감지, 지연 로딩 등 모든 JPA 기능이 동작합니다. 세 번째는 준영속 상태입니다. 영속 상태였던 엔티티가 detach, clear, close 등의 호출로 영속성 컨텍스트에서 분리된 상태입니다. 이 상태에서는 더 이상 변경 감지가 일어나지 않고, 지연 로딩도 할 수 없습니다.</li>
+  </ul>
+</details>
+
+<details>
+  <summary>JPA N + 1 문제에 대해 설명해주세요</summary>
+  <ul>
+    <li> JPA N+1 문제는 하나의 쿼리(1)로 엔티티 목록을 조회했는데, 연관된 엔티티를 접근하는 순간 추가로 N개의 쿼리가 실행되는 현상을 말합니다. 주로 LAZY 로딩 + 컬렉션 또는 연관 관계 매핑에서 자주 발생하며 페치 조인(fetch join), EntityGraph, BatchSize 같은 방식으로 해결할 수 있습니다.</li>
+  </ul>
+</details>
+
+<details>
+  <summary>JPA N + 1 문제에 해결 방안에 대해 설명해주세요</summary>
+  <ul>
+    <li> 페치 조인을 통해 SQL 한번에 모두 조인하여 가져오는 방식이지만, 페이징이 어렵다는 단점이 있습니다. 엔티티 그래프는 내부적으로 fetch Join을 적용하게 됩니다. 배치 사이즈를 적용하는건데 N개의 쿼리가 아니라 In 쿼리 하나로 묶어서 조회하는 것입니다. 페이징 처리에 안전합니다.</li>
+    <li> Fetch Join은 join fetch 문법을 사용해서, 연관 엔티티를 한 번의 쿼리로 같이 가져오고 JPA가 그 결과를 엔티티 그래프로 조립해서 영속성 컨텍스트에 함께 저장하는 기능입니다. 그래서 LAZY에 의해 생기는 N+1을 한 번에 해결할 수 있습니다.</li>
+    <li> 1:N fetch join은 조인 결과 row가 엔티티 수보다 많아져서 DB 레벨에서 limit/offset을 걸면 엔티티 단위 페이징이 아니라 row 단위 잘림이 발생합니다. 그래서 일부 엔티티가 사라지는 문제가 생기기 때문에 JPA에서는 1:N fetch join + 페이징을 권장하지 않습니다.</li>
+  </ul>
+</details>
+
+<details>
+  <summary>페치 조인과 엔티티 그래프의 차이</summary>
+  <ul>
+    <li> Fetch Join은 JPQL 문법으로 join fetch를 사용하는 방식이고, EntityGraph는 어떤 연관 필드를 같이 로딩할지 어노테이션으로 선언하는 방식입니다. 둘 다 N+1 문제를 해결하는 데 사용되지만, Fetch Join은 쿼리 단에서 직접 제어하는 방식이라 튜닝에 유리하고, EntityGraph는 메타데이터 기반이라 코드가 깔끔하고 메서드 이름 기반 쿼리와 결합하기 좋습니다.</li>
+  </ul>
+</details>
+
+<details>
+  <summary>페치 조인은 페이징이 안되나요? 배치사이즈는 어떻게 동작하나요 ?</summary>
+  <ul>
+    <li> Fetch Join은 조인 결과 row가 증가하기 때문에 1:N 관계에서는 DB 페이징이 깨져서 사용할 수 없습니다. 반면 BatchSize는 메인 엔티티 페이징 쿼리를 그대로 두고, 이후 연관 데이터를 별도의 IN 쿼리로 일괄 로딩하기 때문에 row 수가 증가하지 않습니다. 따라서 BatchSize는 1:N에서도 페이징이 항상 안전하게 동작합니다. EntityGraph는 내부적으로 Fetch Join 또는 Batch Fetch 전략을 사용하는데, N:1은 페이징이 가능하지만, 1:N을 그래프로 로딩하면 Fetch Join처럼 페이징이 깨질 수 있습니다.”</li>
+  </ul>
+</details>
+
+
